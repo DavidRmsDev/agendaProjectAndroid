@@ -13,9 +13,9 @@ import retrofit2.http.Query;
 public interface UsuarioService {
 
     @GET("login")
-    Call<Usuario> devolverUsuario(@Query("nickname") String nickname, @Query("password") String password);
+    public Call<Usuario> devolverUsuario(@Query("nickname") String nickname, @Query("password") String password);
 
     @POST("registro")
     @FormUrlEncoded
-    Call<Boolean> registrarUsuario(@Field("nickname") String nickname, @Field("password") String password);
+    public Call<Boolean> registrarUsuario(@Field("nickname") String nickname, @Field("password") String password);
 }

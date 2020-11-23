@@ -108,19 +108,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         call.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                if (response.isSuccessful())
-                {
-                    if (response.body()){
-                        Toast.makeText(LoginActivity.this, "Usuario registrado con éxito, inicie sesión", Toast.LENGTH_LONG).show();
+                if (response.isSuccessful()){
+                    if(response.body()){
                         ocultarTodo();
+                        Toast.makeText(LoginActivity.this, "Usuario registrado con éxito, inicie sesión", Toast.LENGTH_LONG).show();
                     }
-                    else
-                        Toast.makeText(LoginActivity.this, "Usuario ya registrado", Toast.LENGTH_LONG).show();
                 }
                 else{
-                    try {
-                        System.out.println(response.errorBody().string());
-                    } catch (IOException e) {}
+                    Toast.makeText(LoginActivity.this, "El nickname ya existe", Toast.LENGTH_LONG).show();
                 }
                 return;
             }
@@ -161,24 +156,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
                 if (response.isSuccessful())
                 {
-                    //System.out.println("IsSuccessfuuuuuuuuuuuul");
                     usuario.setUser(response.body().getUser());
                     if (!(usuario.getUser()).equals("null")){
                         int user = usuario.getUser().intValue();
-                        System.out.println("Login " + user);
                         guardarPreferencias(user);
                         Toast.makeText(LoginActivity.this, "Usuario logeado con éxito", Toast.LENGTH_LONG).show();
                         cargarIntent(MainActivity.class);
                     }
-                    else
-                        Toast.makeText(LoginActivity.this, "Usuario o contraseña incorrecta", Toast.LENGTH_LONG).show();
                 }
                 else{
-                    try {
-                        System.out.println(response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    Toast.makeText(LoginActivity.this, "Usuario o contraseña incorrecta", Toast.LENGTH_LONG).show();
                 }
                 return;
             }
