@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.agendacontactos">
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".vista.modificarborrarRecordatorioActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".vista.VisualizarRecordatorioActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.AniadirCalendarioActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.modificarborrarNotaActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.aniadirnotaActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.visualizarNotaActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.modificarborrarContactoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.visualizarContactoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.aniadirContactoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vista.LoginActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
