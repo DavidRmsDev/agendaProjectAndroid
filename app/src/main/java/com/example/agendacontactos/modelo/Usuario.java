@@ -1,9 +1,15 @@
 package com.example.agendacontactos.modelo;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Usuario {
 
+    @SerializedName("user")
     private Long user;
+    @SerializedName("nickname")
     private String nickname;
+    @SerializedName("password")
     private String passsword;
 
     public Usuario(){

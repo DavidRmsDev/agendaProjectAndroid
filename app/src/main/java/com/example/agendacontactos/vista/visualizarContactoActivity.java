@@ -10,24 +10,35 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.example.agendacontactos.R;
-import com.example.agendacontactos.controlador.ConexionBBDD;
+import com.example.agendacontactos.controlador.ConexionRetrofit;
+import com.example.agendacontactos.api.service.ContactoService;
 import com.example.agendacontactos.controlador.ContactoAdapter;
 import com.example.agendacontactos.modelo.Contacto;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class visualizarContactoActivity extends AppCompatActivity implements View.OnClickListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class VisualizarContactoActivity extends AppCompatActivity implements View.OnClickListener {
     ListView lista;
     private List<Contacto> items;
     private FloatingActionButton fab;
     private int user;
+    private ConexionRetrofit conexion;
+    private ContactoService contactoService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_visualizar_contacto);
+        conexion = new ConexionRetrofit();
+        contactoService = conexion.getRetrofit().create(ContactoService.class);
         inicializar();
     }
     public void cargarPreferencias(){
@@ -36,26 +47,50 @@ public class visualizarContactoActivity extends AppCompatActivity implements Vie
     }
     public void inicializar(){
         cargarPreferencias();
-        items=new ConexionBBDD(this).devolverContactos(user);
+        llenarLista();
+    }
+
+    public void llenarLista(){
+        Call<List<Contacto>> call = contactoService.listarContactos(user);
+        call.enqueue(new Callback<List<Contacto>>() {
+            @Override
+            public void onResponse(Call<List<Contacto>> call, Response<List<Contacto>> response) {
+                try{
+                    if(response.isSuccessful()){
+                        items = response.body();
+                        cargarContactos();
+                    }
+                } catch (Exception ex){
+                    Toast.makeText(VisualizarContactoActivity.this, ex.getMessage(), Toast.LENGTH_SHORT);
+                }
+            }
+            @Override
+            public void onFailure(Call<List<Contacto>> call, Throwable t) {
+                Toast.makeText(VisualizarContactoActivity.this,"Error de conexión", Toast.LENGTH_SHORT);
+            }
+        });
+    }
+
+    public void cargarContactos(){
         lista = (ListView)findViewById(R.id.listContacto);
         fab = (FloatingActionButton) findViewById(R.id.fabid);
         fab.setOnClickListener(this);
         final ContactoAdapter adaptador= new ContactoAdapter(this,R.layout.contacto_item,items);
 
-    lista.setAdapter(adaptador);
+        lista.setAdapter(adaptador);
 
-    lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if(items.get(position).getId()!=null){
-               marcador(String.valueOf(items.get(position).getTelefono()));
+        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(items.get(position).getId()!=null){
+                    marcador(String.valueOf(items.get(position).getTelefono()));
+                }
+
             }
-
-        }
-    });
+        });
         lista.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if(items.get(position).getId()!=null){
-                    cargarIntent(modificarborrarContactoActivity.class,String.valueOf(items.get(position).getId()));
+                    cargarIntent(ModificarborrarContactoActivity.class,String.valueOf(items.get(position).getId()));
                 }
 
                 return false;
@@ -79,7 +114,7 @@ public class visualizarContactoActivity extends AppCompatActivity implements Vie
     @Override
     public void onClick(View v) {
         if(v.getId()==R.id.fabid){
-            Intent intent = new Intent(this, aniadirContactoActivity.class);
+            Intent intent = new Intent(this, AniadirContactoActivity.class);
             startActivity(intent);
         }
     }

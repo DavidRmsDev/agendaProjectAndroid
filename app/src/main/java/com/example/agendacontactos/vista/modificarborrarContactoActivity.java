@@ -13,12 +13,18 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.agendacontactos.R;
-import com.example.agendacontactos.controlador.ConexionBBDD;
-import com.example.agendacontactos.modelo.Contacto;
+import com.example.agendacontactos.controlador.ConexionRetrofit;
+import com.example.agendacontactos.api.service.ContactoService;
+import com.example.agendacontactos.modelo.Contacto;;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class modificarborrarContactoActivity extends AppCompatActivity implements View.OnClickListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ModificarborrarContactoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int id;
     private EditText nombre;
@@ -28,25 +34,52 @@ public class modificarborrarContactoActivity extends AppCompatActivity implement
     private EditText telefono;
     private Button borrar;
     private Button modificar;
-    Contacto c;
+    private Contacto c;
+    private ConexionRetrofit conexion;
+    private ContactoService contactoService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modificarborrarcontacto);
         id= Integer.parseInt(getIntent().getStringExtra("id"));
-        //Toast.makeText(this, "wea "+getIntent().getStringExtra("id"), Toast.LENGTH_SHORT).show();
-        c=new ConexionBBDD(this).devolverContacto(id);
-        nombre= (EditText) findViewById(R.id.nombretextview);
-        apellidos= (EditText) findViewById(R.id.apellidostextview);
-        direccion= (EditText) findViewById(R.id.direcciontextview);
-        email= (EditText) findViewById(R.id.emailtextview);
-        telefono= (EditText) findViewById(R.id.telefonotextview);
-        cargarContacto(c);
-        borrar = (Button) findViewById(R.id.borrarbtn);
-        modificar = (Button) findViewById(R.id.modificarbtn);
-        borrar.setOnClickListener(this);
-        modificar.setOnClickListener(this);
+
+        conexion = new ConexionRetrofit();
+        contactoService = conexion.getRetrofit().create(ContactoService.class);
+        devolverContacto();
+    }
+
+    public void devolverContacto(){
+        Call<Contacto> call = contactoService.seleccionaUnContacto(id);
+
+        call.enqueue(new Callback<Contacto>() {
+            @Override
+            public void onResponse(Call<Contacto> call, Response<Contacto> response) {
+                if (response.isSuccessful()){
+                    c = new Contacto(response.body());
+                    nombre= (EditText) findViewById(R.id.nombretextview);
+                    apellidos= (EditText) findViewById(R.id.apellidostextview);
+                    direccion= (EditText) findViewById(R.id.direcciontextview);
+                    email= (EditText) findViewById(R.id.emailtextview);
+                    telefono= (EditText) findViewById(R.id.telefonotextview);
+                    cargarContacto(c);
+                    borrar = (Button) findViewById(R.id.borrarbtn);
+                    modificar = (Button) findViewById(R.id.modificarbtn);
+                    borrar.setOnClickListener(ModificarborrarContactoActivity.this);
+                    modificar.setOnClickListener(ModificarborrarContactoActivity.this);
+                }
+                else{
+                    try {
+                        Toast.makeText(ModificarborrarContactoActivity.this,response.errorBody().string(), Toast.LENGTH_SHORT);
+                    } catch (IOException e) {}
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Contacto> call, Throwable t) {
+                Toast.makeText(ModificarborrarContactoActivity.this,"Error de conexión", Toast.LENGTH_SHORT);
+            }
+        });
     }
 
     public void cargarContacto(Contacto c){
@@ -74,18 +107,41 @@ public class modificarborrarContactoActivity extends AppCompatActivity implement
             else if(email.getText().length()!=0 && !validarEmail(email.getText().toString())){
                 Toast.makeText(this,"Formato de email incorrecto",Toast.LENGTH_LONG).show();
             }
-            else{
-                if(new ConexionBBDD(this).modificarContacto(Integer.toString(id),nombre.getText().toString(),apellidos.getText().toString(),direccion.getText().toString(),telefono.getText().toString(),email.getText().toString()))
-                {Toast.makeText(this, "Contacto modificado", Toast.LENGTH_SHORT).show();
-                cargarIntent(visualizarContactoActivity.class);
-                }
-                else
-                    Toast.makeText(this, "No se ha podido modificar el contacto", Toast.LENGTH_SHORT).show();
-
-            }
+            else
+                modificar();
         }
 
     }
+
+    private void modificar(){
+        Call<Boolean> call = contactoService.modificarContacto(new Integer(id), nombre.getText().toString(),
+                apellidos.getText().toString(), Integer.parseInt(telefono.getText().toString()),
+                direccion.getText().toString(), email.getText().toString());
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(response.isSuccessful()){
+                    if(response.body()) {
+                        Toast.makeText(ModificarborrarContactoActivity.this, "Contacto modificado", Toast.LENGTH_SHORT).show();
+                        cargarIntent(VisualizarContactoActivity.class);
+                    }
+                }
+                else {
+                    try {
+                        Toast.makeText(ModificarborrarContactoActivity.this,response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {}
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Toast.makeText(ModificarborrarContactoActivity.this, "Error de conexion", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private boolean validarEmail(String email) {
         Pattern pattern = Patterns.EMAIL_ADDRESS;
         return pattern.matcher(email).matches();
@@ -117,15 +173,33 @@ public class modificarborrarContactoActivity extends AppCompatActivity implement
     }
 
     public void borrar(){
-        if(new ConexionBBDD(this).borrarContacto(id)){
-            Toast.makeText(this, "Contacto borrado", Toast.LENGTH_SHORT).show();
-            cargarIntent(visualizarContactoActivity.class);
-        }
-        else
-            Toast.makeText(this, "No se ha podido borrar el contacto", Toast.LENGTH_SHORT).show();
+        Call<Boolean> call = contactoService.borrarContacto(id);
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(response.isSuccessful()){
+                    if(response.body()) {
+                        Toast.makeText(ModificarborrarContactoActivity.this, "Contacto eliminado", Toast.LENGTH_SHORT).show();
+                        cargarIntent(VisualizarContactoActivity.class);
+                    }
+                }
+                else {
+                    try {
+                        Toast.makeText(ModificarborrarContactoActivity.this, response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {}
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Toast.makeText(ModificarborrarContactoActivity.this, "Error de conexion", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
     @Override
     public void onBackPressed() {
-        cargarIntent(visualizarContactoActivity.class);
+        cargarIntent(VisualizarContactoActivity.class);
     }
 }

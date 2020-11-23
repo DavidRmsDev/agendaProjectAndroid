@@ -12,20 +12,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.agendacontactos.R;
-import com.example.agendacontactos.controlador.ConexionBBDD;
+import com.example.agendacontactos.api.service.NotaService;
+import com.example.agendacontactos.controlador.ConexionRetrofit;
 import com.example.agendacontactos.modelo.Notas;
 
-public class aniadirnotaActivity extends AppCompatActivity implements View.OnClickListener {
+import java.io.IOException;
+import java.util.Date;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class AniadirnotaActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     private TextView titulo,notas;
     private Button aniadir;
     private int user;
+    private Notas nota;
+    private ConexionRetrofit retrofit;
+    private NotaService notaService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aniadirnota);
+        retrofit = new ConexionRetrofit();
+        notaService = retrofit.getRetrofit().create(NotaService.class);
         cargarPreferencias();
         titulo = (TextView) findViewById(R.id.tituloidEditText);
         notas = (TextView) findViewById(R.id.notasidEditText);
@@ -36,27 +49,51 @@ public class aniadirnotaActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
-        if(titulo.getText().toString().length()!=0){
-            if(notas.getText().toString().length()!=0){
-                if(new ConexionBBDD(this).insertarNota(crearNota())!=-1) {
-                    Toast.makeText(this, "Nota insertada con éxito", Toast.LENGTH_LONG).show();
-                    cargarIntent(visualizarNotaActivity.class);
-                }
-            }
-            else
+        if(titulo.getText().toString().length()==0)
+            Toast.makeText(this, "Debe introducir un título", Toast.LENGTH_LONG).show();
+        else {
+            if(notas.getText().toString().length()==0)
                 Toast.makeText(this,"Debe introducir una nota",Toast.LENGTH_LONG).show();
+            else {
+                crearNota();
+                insertarNota();
+            }
         }
-        else
-            Toast.makeText(this,"Debe introducir un título",Toast.LENGTH_LONG).show();
+
     }
 
+    public void insertarNota(){
+        Call<Boolean> call = notaService.insertarNota(nota.getUser(),nota.getTitulo(),nota.getNotas(),nota.getFecha());
 
-    public Notas crearNota(){
-        Notas c=new Notas();
-        c.setTitulo(titulo.getText().toString());
-        c.setNotas(notas.getText().toString());
-        c.setUser(user);
-        return c;
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(response.isSuccessful()){
+                    Toast.makeText(AniadirnotaActivity.this, "Nota insertada con éxito", Toast.LENGTH_LONG).show();
+                    cargarIntent(VisualizarNotaActivity.class);
+                }
+                else {
+                    try {
+                        Toast.makeText(AniadirnotaActivity.this, response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {}
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Toast.makeText(AniadirnotaActivity.this, "Error de conexion", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void crearNota(){
+        //TODO revisar crear fecha, porque lo pone en GMT 0 no es GMT +1 o CEST
+        nota = new Notas();
+        nota.setTitulo(titulo.getText().toString());
+        nota.setNotas(notas.getText().toString());
+        nota.setFecha((new Date()).toString());
+        nota.setUser(user);
     }
     public void cargarIntent(Class ventana){
         Intent intent = new Intent(this,ventana);
@@ -68,6 +105,6 @@ public class aniadirnotaActivity extends AppCompatActivity implements View.OnCli
     }
     @Override
     public void onBackPressed() {
-        cargarIntent(visualizarNotaActivity.class);
+        cargarIntent(VisualizarNotaActivity.class);
     }
 }

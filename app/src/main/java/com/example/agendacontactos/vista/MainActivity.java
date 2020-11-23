@@ -32,10 +32,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
 
             case R.id.contactosbtn:
-                cargarIntent(visualizarContactoActivity.class);
+                cargarIntent(VisualizarContactoActivity.class);
                 break;
             case R.id.notasbtn:
-                cargarIntent(visualizarNotaActivity.class);
+                cargarIntent(VisualizarNotaActivity.class);
                 break;
             case R.id.recordatoriosbtn:
                 cargarIntent(VisualizarRecordatorioActivity.class);

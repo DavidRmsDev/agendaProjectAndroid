@@ -13,12 +13,18 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.agendacontactos.R;
-import com.example.agendacontactos.controlador.ConexionBBDD;
+import com.example.agendacontactos.controlador.ConexionRetrofit;
+import com.example.agendacontactos.api.service.ContactoService;
 import com.example.agendacontactos.modelo.Contacto;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class aniadirContactoActivity extends AppCompatActivity implements View.OnClickListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class AniadirContactoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView nombre;
     private TextView apellidos;
@@ -27,17 +33,22 @@ public class aniadirContactoActivity extends AppCompatActivity implements View.O
     private TextView telefono;
     private Button btnAniadir;
     private int user;
+    private Contacto contacto;
+    private ConexionRetrofit conexion;
+    private ContactoService contactoService;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.aniadircontactos);
-        cargarPreferencias();
+        conexion = new ConexionRetrofit();
+        contactoService = conexion.getRetrofit().create(ContactoService.class);
         btnAniadir = (Button) findViewById(R.id.btnaniadir);
         nombre = (TextView) findViewById(R.id.nombreeditTexto);
         apellidos = (TextView) findViewById(R.id.apellidoseditText);
         direccion = (TextView) findViewById(R.id.direccioneditText);
         email = (TextView) findViewById(R.id.emaileditText);
         telefono = (TextView) findViewById(R.id.telefonoeditText);
+        cargarPreferencias();
         btnAniadir.setOnClickListener(this);
     }
     public void cargarPreferencias(){
@@ -54,27 +65,50 @@ public class aniadirContactoActivity extends AppCompatActivity implements View.O
         else if(email.getText().length()!=0 && !validarEmail(email.getText().toString())){
             Toast.makeText(this,"Formato de email incorrecto",Toast.LENGTH_LONG).show();
         }
-        else
-            if(new ConexionBBDD(this).insertarContacto(crearContacto())!=-1) {
-                Toast.makeText(this, "Contacto insertado con éxito", Toast.LENGTH_LONG).show();
-                cargarIntent(visualizarContactoActivity.class);
-            }
-            else
-                Toast.makeText(this,"No se ha podido agregar el contacto. Teléfono ya registrado",Toast.LENGTH_LONG).show();
+        else {
+            crearContacto();
+            añadir();
+        }
     }
 
-    public Contacto crearContacto(){
-        Contacto c=new Contacto();
-        c.setNombre(nombre.getText().toString());
+    public void crearContacto(){
+        contacto=new Contacto();
+
+        contacto.setNombre(nombre.getText().toString());
         if(!apellidos.getText().toString().isEmpty())
-            c.setApellidos(apellidos.getText().toString());
-        c.setTelefono(telefono.getText().toString());
+            contacto.setApellidos(apellidos.getText().toString());
+        contacto.setTelefono(telefono.getText().toString());
         if(!direccion.getText().toString().isEmpty())
-            c.setDireccion(direccion.getText().toString());
+            contacto.setDireccion(direccion.getText().toString());
         if(!email.getText().toString().isEmpty())
-            c.setEmail(email.getText().toString());
-        c.setUser(user);
-        return c;
+            contacto.setEmail(email.getText().toString());
+        contacto.setUser(user);
+    }
+
+    public void añadir(){
+        Call<Boolean> call = contactoService.insertarContacto(contacto.getUser(),contacto.getNombre(),contacto.getApellidos(),
+                Integer.parseInt(contacto.getTelefono()),contacto.getDireccion(),contacto.getEmail());
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(response.isSuccessful()){
+                    Toast.makeText(AniadirContactoActivity.this, "Contacto insertado con éxito", Toast.LENGTH_LONG).show();
+                    cargarIntent(VisualizarContactoActivity.class);
+                }
+                else {
+                    try {
+                        Toast.makeText(AniadirContactoActivity.this, response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {}
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Toast.makeText(AniadirContactoActivity.this, "Error de conexion", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private boolean validarEmail(String email) {
@@ -88,6 +122,6 @@ public class aniadirContactoActivity extends AppCompatActivity implements View.O
     }
     @Override
     public void onBackPressed() {
-        cargarIntent(visualizarContactoActivity.class);
+        cargarIntent(VisualizarContactoActivity.class);
     }
 }

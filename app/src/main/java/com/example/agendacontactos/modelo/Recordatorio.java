@@ -9,6 +9,15 @@ public class Recordatorio {
     private String hora;
     private String titulo;
 
+    public Recordatorio(Recordatorio recordatorio){
+        this.setId(recordatorio.getId());
+        this.setUser(recordatorio.getUser());
+        this.setDescripcion(recordatorio.getDescripcion());
+        this.setFecha(recordatorio.getFecha());
+        this.setHora(recordatorio.getHora());
+        this.setTitulo(recordatorio.getTitulo());
+    }
+
     public Recordatorio() {
         this.id = null;
         this.user = 0;

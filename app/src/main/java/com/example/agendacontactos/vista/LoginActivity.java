@@ -13,25 +13,38 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.agendacontactos.R;
-import com.example.agendacontactos.controlador.ConexionBBDD;
+import com.example.agendacontactos.controlador.ConexionRetrofit;
+import com.example.agendacontactos.api.service.UsuarioService;
 import com.example.agendacontactos.modelo.Usuario;
+
+import java.io.IOException;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView iniciarSesion,registrarse;
     private EditText nickid,passid;
     private Button ini,reg;
+    //private UsuarioController usuarioController;
+    private ConexionRetrofit conexion;
+    private UsuarioService usuarioService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         iniciarSesion = (TextView) findViewById(R.id.iniciarid);
         registrarse = (TextView) findViewById(R.id.registrarid);
         nickid = (EditText) findViewById(R.id.nicktextid);
         passid = (EditText) findViewById(R.id.passtextid);
         ini = (Button) findViewById(R.id.inicid);
         reg = (Button) findViewById(R.id.regisid);
+        conexion = new ConexionRetrofit();
+        usuarioService = conexion.getRetrofit().create(UsuarioService.class);
         iniciarSesion.setOnClickListener(this);
         registrarse.setOnClickListener(this);
         ini.setOnClickListener(this);
@@ -90,26 +103,37 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void registroNuevo(){
-        Usuario u = new Usuario();
-        u.setNickname(nickid.getText().toString());
-        u.setPasssword(passid.getText().toString());
-        if(new ConexionBBDD(this).insertarUsuario(u)!=-1) {
-            Toast.makeText(this, "Usuario registrado con éxito, inicie sesión", Toast.LENGTH_LONG).show();
-            ocultarTodo();
-        }
-        else
-            Toast.makeText(this, "Usuario ya registrado", Toast.LENGTH_LONG).show();
+        Call<Boolean> call = usuarioService.registrarUsuario(nickid.getText().toString(), passid.getText().toString());
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful())
+                {
+                    if (response.body()){
+                        Toast.makeText(LoginActivity.this, "Usuario registrado con éxito, inicie sesión", Toast.LENGTH_LONG).show();
+                        ocultarTodo();
+                    }
+                    else
+                        Toast.makeText(LoginActivity.this, "Usuario ya registrado", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    try {
+                        System.out.println(response.errorBody().string());
+                    } catch (IOException e) {}
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "Error de conexión", Toast.LENGTH_SHORT);
+            }
+        });
     }
     public void login(){
-        String login;
         if(comprobarCampos()){
-            if (!(login=devolverUserId()).equals("null")){
-                Toast.makeText(this, "Usuario logeado con éxito", Toast.LENGTH_LONG).show();
-                guardarPreferencias(Integer.parseInt(login));
-                cargarIntent(MainActivity.class);
-            }
-            else
-                Toast.makeText(this, "Usuario o contraseña incorrecta", Toast.LENGTH_LONG).show();
+            devolverUserId();
         }
     }
 
@@ -126,14 +150,50 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         editor.putInt("user",0);
         editor.commit();
     }
-    public String devolverUserId(){
-        String id = new ConexionBBDD(this).devolverUsuario(nickid.getText().toString(),passid.getText().toString());
-        return id;
+    public void devolverUserId(){
+        //TODO refactorizar
+        Call<Usuario> call = usuarioService.devolverUsuario(nickid.getText().toString(), passid.getText().toString());
+
+        Usuario usuario = new Usuario();
+
+        call.enqueue(new Callback<Usuario>() {
+            @Override
+            public void onResponse(Call<Usuario> call, Response<Usuario> response) {
+                if (response.isSuccessful())
+                {
+                    //System.out.println("IsSuccessfuuuuuuuuuuuul");
+                    usuario.setUser(response.body().getUser());
+                    if (!(usuario.getUser()).equals("null")){
+                        int user = usuario.getUser().intValue();
+                        System.out.println("Login " + user);
+                        guardarPreferencias(user);
+                        Toast.makeText(LoginActivity.this, "Usuario logeado con éxito", Toast.LENGTH_LONG).show();
+                        cargarIntent(MainActivity.class);
+                    }
+                    else
+                        Toast.makeText(LoginActivity.this, "Usuario o contraseña incorrecta", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    try {
+                        System.out.println(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Usuario> call, Throwable t) {
+                //System.out.println("Mensaje: " + t.getMessage() + "  Error: " + t.getLocalizedMessage());
+                Toast.makeText(LoginActivity.this, "Error de conexión", Toast.LENGTH_SHORT);
+            }
+        });
     }
+
     public void cargarIntent(Class ventana){
         Intent intent = new Intent(this,ventana);
         startActivity(intent);
     }
-
 
 }

@@ -17,14 +17,19 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.agendacontactos.R;
-import com.example.agendacontactos.controlador.ConexionBBDD;
+import com.example.agendacontactos.api.service.RecordatorioService;
+import com.example.agendacontactos.controlador.ConexionRetrofit;
 import com.example.agendacontactos.modelo.DatePickerFragment;
-import com.example.agendacontactos.modelo.Notas;
 import com.example.agendacontactos.modelo.Recordatorio;
 
+import java.io.IOException;
 import java.util.Calendar;
 
-public class modificarborrarRecordatorioActivity extends AppCompatActivity implements View.OnClickListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ModificarborrarRecordatorioActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int id;
     private EditText titulo;
@@ -34,27 +39,56 @@ public class modificarborrarRecordatorioActivity extends AppCompatActivity imple
     private Button borrar;
     private Button modificar;
     private ImageView calendario,reloj;
-    Recordatorio c;
+    private Recordatorio recordatorio;
+    private ConexionRetrofit retrofit;
+    private RecordatorioService recordatorioService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modificarborrar_recordatorio);
+        retrofit = new ConexionRetrofit();
+        recordatorioService = retrofit.getRetrofit().create(RecordatorioService.class);
+
         id= Integer.parseInt(getIntent().getStringExtra("id"));
-        c=new ConexionBBDD(this).devolverRecordatorio(id);
-        titulo = (EditText) findViewById(R.id.Rectituloid);
-        fecha = (EditText) findViewById(R.id.Recfechaid);
-        hora = (EditText) findViewById(R.id.Rechoraid);
-        descripcion = (EditText) findViewById(R.id.Recdescripcionid);
-        borrar = (Button) findViewById(R.id.btn_borrRec);
-        modificar = (Button) findViewById(R.id.btn_modRec);
-        calendario = (ImageView) findViewById(R.id.calendariomod);
-        reloj = (ImageView) findViewById(R.id.horamod);
-        borrar.setOnClickListener(this);
-        modificar.setOnClickListener(this);
-        reloj.setOnClickListener(this);
-        calendario.setOnClickListener(this);
-        cargarRecordatorio(c);
+        devolverRecordatorio();
+    }
+
+    public void devolverRecordatorio(){
+        Call<Recordatorio> call = recordatorioService.seleccionaUnRecordatorio(id);
+
+        call.enqueue(new Callback<Recordatorio>() {
+            @Override
+            public void onResponse(Call<Recordatorio> call, Response<Recordatorio> response) {
+                if (response.isSuccessful()){
+                    recordatorio = new Recordatorio(response.body());
+
+                    titulo = (EditText) findViewById(R.id.Rectituloid);
+                    fecha = (EditText) findViewById(R.id.Recfechaid);
+                    hora = (EditText) findViewById(R.id.Rechoraid);
+                    descripcion = (EditText) findViewById(R.id.Recdescripcionid);
+                    borrar = (Button) findViewById(R.id.btn_borrRec);
+                    modificar = (Button) findViewById(R.id.btn_modRec);
+                    calendario = (ImageView) findViewById(R.id.calendariomod);
+                    reloj = (ImageView) findViewById(R.id.horamod);
+                    cargarRecordatorio(recordatorio);
+                    borrar.setOnClickListener(ModificarborrarRecordatorioActivity.this);
+                    modificar.setOnClickListener(ModificarborrarRecordatorioActivity.this);
+                    reloj.setOnClickListener(ModificarborrarRecordatorioActivity.this);
+                    calendario.setOnClickListener(ModificarborrarRecordatorioActivity.this);
+                }
+                else{
+                    try {
+                        Toast.makeText(ModificarborrarRecordatorioActivity.this,response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {}
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Recordatorio> call, Throwable t) {
+                Toast.makeText(ModificarborrarRecordatorioActivity.this,"Error de conexión", Toast.LENGTH_SHORT);
+            }
+        });
     }
 
     @Override
@@ -66,22 +100,13 @@ public class modificarborrarRecordatorioActivity extends AppCompatActivity imple
             if(titulo.getText().toString().isEmpty()){
                 Toast.makeText(this,"Debe rellenar campo de título",Toast.LENGTH_LONG).show();
             }
-            else{
-                if(fecha.getText().toString().isEmpty()){
-                    Toast.makeText(this,"Debe rellenar campo de fecha",Toast.LENGTH_LONG).show();
-                }
-                else if(hora.getText().toString().isEmpty()){
-                    Toast.makeText(this,"Debe rellenar campo de hora",Toast.LENGTH_LONG).show();
-                }
-                else{
-                    if(new ConexionBBDD(this).modificarRecordatorio(Integer.toString(id),titulo.getText().toString(),fecha.getText().toString(),hora.getText().toString(),descripcion.getText().toString()))
-                    {Toast.makeText(this, "Recordatorio modificado", Toast.LENGTH_SHORT).show();
-                        cargarIntent(VisualizarRecordatorioActivity.class);
-                    }
-                    else
-                        Toast.makeText(this, "No se ha podido modificar el recordatorio", Toast.LENGTH_SHORT).show();
-                }
-
+            else {
+                if (fecha.getText().toString().isEmpty()) {
+                    Toast.makeText(this, "Debe rellenar campo de fecha", Toast.LENGTH_LONG).show();
+                } else if (hora.getText().toString().isEmpty()) {
+                    Toast.makeText(this, "Debe rellenar campo de hora", Toast.LENGTH_LONG).show();
+                } else
+                    modificar();
             }
         }
         else if(v.getId()==R.id.horamod){
@@ -90,6 +115,33 @@ public class modificarborrarRecordatorioActivity extends AppCompatActivity imple
         else if(v.getId()==R.id.calendariomod){
             showDatePickerDialog();
         }
+    }
+
+    public void modificar(){
+        Call<Boolean> call = recordatorioService.modificarRecordatorio(new Integer(id),titulo.getText().toString(),fecha.getText().toString(),hora.getText().toString(),descripcion.getText().toString());
+
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(response.isSuccessful()){
+                    if(response.body()) {
+                        Toast.makeText(ModificarborrarRecordatorioActivity.this, "Recordatorio modificado", Toast.LENGTH_SHORT).show();
+                        cargarIntent(VisualizarRecordatorioActivity.class);
+                    }
+                }
+                else {
+                    try {
+                        Toast.makeText(ModificarborrarRecordatorioActivity.this, response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {}
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Toast.makeText(ModificarborrarRecordatorioActivity.this, "No se ha podido modificar el recordatorio", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void cargarRecordatorio(Recordatorio c){
@@ -126,12 +178,29 @@ public class modificarborrarRecordatorioActivity extends AppCompatActivity imple
     }
 
     public void borrar(){
-        if(new ConexionBBDD(this).borrarRecordatorio(id)){
-            Toast.makeText(this, "Recordatorio borrado", Toast.LENGTH_SHORT).show();
-            cargarIntent(VisualizarRecordatorioActivity.class);
-        }
-        else
-            Toast.makeText(this, "No se ha podido borrar el recordatorio", Toast.LENGTH_SHORT).show();
+        Call<Boolean> call = recordatorioService.borrarRecordatorio(id);
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if(response.isSuccessful()){
+                    if(response.body()) {
+                        Toast.makeText(ModificarborrarRecordatorioActivity.this, "Recordatorio eliminado", Toast.LENGTH_SHORT).show();
+                        cargarIntent(VisualizarRecordatorioActivity.class);
+                    }
+                }
+                else {
+                    try {
+                        Toast.makeText(ModificarborrarRecordatorioActivity.this, response.errorBody().string(), Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {}
+                }
+                return;
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Toast.makeText(ModificarborrarRecordatorioActivity.this, "Error de conexion, no se ha podido borrar el recordatorio", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     @Override
     public void onBackPressed() {

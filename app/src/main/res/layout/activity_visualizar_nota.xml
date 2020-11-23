@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fondopapel"
-    tools:context=".vista.visualizarNotaActivity">
+    tools:context=".vista.VisualizarNotaActivity">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabnotaid"

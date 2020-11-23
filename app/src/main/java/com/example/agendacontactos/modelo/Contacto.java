@@ -1,13 +1,30 @@
 package com.example.agendacontactos.modelo;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Contacto {
 
+    @SerializedName("id")
+    @Expose
     private Long id;
+    @SerializedName("user")
+    @Expose
     private int user;
+    @SerializedName("nombre")
+    @Expose
     private String nombre;
+    @SerializedName("telefono")
+    @Expose
     private String Telefono;
+    @SerializedName("email")
+    @Expose
     private String email;
+    @SerializedName("direccion")
+    @Expose
     private String direccion;
+    @SerializedName("apellidos")
+    @Expose
     private String apellidos;
 
     public Contacto(){
@@ -28,6 +45,14 @@ public class Contacto {
         this.apellidos = apellidos;
         this.id=null;
         this.user=0;
+    }
+
+    public Contacto(Contacto contacto) {
+        this.setNombre(contacto.getNombre());
+        this.setApellidos(contacto.getApellidos());
+        this.setTelefono(contacto.getTelefono());
+        this.setDireccion(contacto.getEmail());
+        this.setEmail(contacto.getEmail());
     }
 
     public Long getId() {

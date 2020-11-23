@@ -10,6 +10,14 @@ public class Notas {
     private String fecha;
     private String titulo;
 
+    public Notas(Notas nota){
+        this.setId(nota.getId());
+        this.setUser(nota.getUser());
+        this.setNotas(nota.getNotas());
+        this.setFecha(nota.getFecha());
+        this.setTitulo(nota.getTitulo());
+    }
+
     public Notas(String notas, String fecha, String titulo) {
         this.notas = notas;
         this.fecha = fecha;

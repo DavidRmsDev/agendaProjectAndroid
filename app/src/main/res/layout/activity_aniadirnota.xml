@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/fondopapel"
     android:visibility="visible"
-    tools:context=".vista.aniadirnotaActivity"
+    tools:context=".vista.AniadirnotaActivity"
     tools:visibility="visible">
 
     <TextView
