@@ -6,6 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ConexionRetrofit {
 
     private Retrofit retrofit;
+    /*http://10.0.2.2:8080/*/
     private String url = "https://agendaprojectapi.herokuapp.com/";
 
     public ConexionRetrofit(){
