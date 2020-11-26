@@ -51,7 +51,7 @@ public class Contacto {
         this.setNombre(contacto.getNombre());
         this.setApellidos(contacto.getApellidos());
         this.setTelefono(contacto.getTelefono());
-        this.setDireccion(contacto.getEmail());
+        this.setDireccion(contacto.getDireccion());
         this.setEmail(contacto.getEmail());
     }
 
