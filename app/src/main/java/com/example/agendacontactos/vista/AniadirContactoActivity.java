@@ -18,6 +18,7 @@ import com.example.agendacontactos.api.service.ContactoService;
 import com.example.agendacontactos.modelo.Contacto;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
@@ -57,14 +58,12 @@ public class AniadirContactoActivity extends AppCompatActivity implements View.O
     }
     @Override
     public void onClick(View v) {
-        if (nombre.getText().toString().isEmpty()|| telefono.getText().toString().isEmpty())
-            Toast.makeText(this,"Debe rellenar campos de nobre y teléfono",Toast.LENGTH_LONG).show();
-        else if(telefono.getText().toString().length()!=9){
-            Toast.makeText(this,"Formato de teléfono incorrecto",Toast.LENGTH_LONG).show();
-        }
-        else if(email.getText().length()!=0 && !validarEmail(email.getText().toString())){
+        if (telefono.getText().toString().isEmpty())
+            Toast.makeText(this,"Debe rellenar el campo teléfono",Toast.LENGTH_LONG).show();
+        else if(telefono.getText().toString().length()!=9)
+                Toast.makeText(this,"Formato de teléfono incorrecto",Toast.LENGTH_LONG).show();
+        else if(email.getText().length() > 0 && !validarEmail(email.getText().toString()))
             Toast.makeText(this,"Formato de email incorrecto",Toast.LENGTH_LONG).show();
-        }
         else {
             crearContacto();
             añadir();
@@ -72,9 +71,17 @@ public class AniadirContactoActivity extends AppCompatActivity implements View.O
     }
 
     public void crearContacto(){
-        contacto=new Contacto();
+        contacto=new Contacto("","","","","");
 
+        if(!telefono.getText().toString().isEmpty())
+            contacto.setTelefono(telefono.getText().toString());
         contacto.setNombre(nombre.getText().toString());
+        contacto.setApellidos(apellidos.getText().toString());
+        contacto.setDireccion(direccion.getText().toString());
+        contacto.setEmail(email.getText().toString());
+
+        contacto.setUser(user);
+        /*contacto.setNombre(nombre.getText().toString());
         if(!apellidos.getText().toString().isEmpty())
             contacto.setApellidos(apellidos.getText().toString());
         contacto.setTelefono(telefono.getText().toString());
@@ -82,7 +89,7 @@ public class AniadirContactoActivity extends AppCompatActivity implements View.O
             contacto.setDireccion(direccion.getText().toString());
         if(!email.getText().toString().isEmpty())
             contacto.setEmail(email.getText().toString());
-        contacto.setUser(user);
+        contacto.setUser(user);*/
     }
 
     public void añadir(){
@@ -112,8 +119,9 @@ public class AniadirContactoActivity extends AppCompatActivity implements View.O
     }
 
     private boolean validarEmail(String email) {
-        Pattern pattern = Patterns.EMAIL_ADDRESS;
-        return pattern.matcher(email).matches();
+        Pattern patron = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = patron.matcher(email);
+        return matcher.find();
     }
 
     public void cargarIntent(Class ventana){

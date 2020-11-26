@@ -154,8 +154,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         call.enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call<Usuario> call, Response<Usuario> response) {
-                if (response.isSuccessful())
-                {
+                if (response.isSuccessful()) {
                     usuario.setUser(response.body().getUser());
                     if (!(usuario.getUser()).equals("null")){
                         int user = usuario.getUser().intValue();

@@ -17,7 +17,10 @@ import com.example.agendacontactos.controlador.ConexionRetrofit;
 import com.example.agendacontactos.modelo.Notas;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -90,9 +93,12 @@ public class AniadirnotaActivity extends AppCompatActivity implements View.OnCli
     public void crearNota(){
         //TODO revisar crear fecha, porque lo pone en GMT 0 no es GMT +1 o CEST
         nota = new Notas();
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE d MMMM HH:mm:ss yyyy", Locale.forLanguageTag("es-ES"));
+        sdf.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+
         nota.setTitulo(titulo.getText().toString());
         nota.setNotas(notas.getText().toString());
-        nota.setFecha((new Date()).toString());
+        nota.setFecha((sdf.format(new Date()).toString()));
         nota.setUser(user);
     }
     public void cargarIntent(Class ventana){
