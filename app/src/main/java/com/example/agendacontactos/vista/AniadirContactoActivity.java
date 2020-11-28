@@ -81,15 +81,6 @@ public class AniadirContactoActivity extends AppCompatActivity implements View.O
         contacto.setEmail(email.getText().toString());
 
         contacto.setUser(user);
-        /*contacto.setNombre(nombre.getText().toString());
-        if(!apellidos.getText().toString().isEmpty())
-            contacto.setApellidos(apellidos.getText().toString());
-        contacto.setTelefono(telefono.getText().toString());
-        if(!direccion.getText().toString().isEmpty())
-            contacto.setDireccion(direccion.getText().toString());
-        if(!email.getText().toString().isEmpty())
-            contacto.setEmail(email.getText().toString());
-        contacto.setUser(user);*/
     }
 
     public void añadir(){
@@ -119,7 +110,7 @@ public class AniadirContactoActivity extends AppCompatActivity implements View.O
     }
 
     private boolean validarEmail(String email) {
-        Pattern patron = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Pattern patron = Pattern.compile("/^(([^<>()[\\]\\.,;:\\s@\\\"]+(\\.[^<>()[\\]\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@(([^<>()[\\]\\.,;:\\s@\\\"]+\\.)+[^<>()[\\]\\.,;:\\s@\\\"]{2,})$/i", Pattern.CASE_INSENSITIVE);
         Matcher matcher = patron.matcher(email);
         return matcher.find();
     }

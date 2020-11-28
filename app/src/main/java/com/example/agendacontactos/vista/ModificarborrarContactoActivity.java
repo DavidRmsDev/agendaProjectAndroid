@@ -18,6 +18,7 @@ import com.example.agendacontactos.api.service.ContactoService;
 import com.example.agendacontactos.modelo.Contacto;;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
@@ -143,8 +144,9 @@ public class ModificarborrarContactoActivity extends AppCompatActivity implement
     }
 
     private boolean validarEmail(String email) {
-        Pattern pattern = Patterns.EMAIL_ADDRESS;
-        return pattern.matcher(email).matches();
+        Pattern patron = Pattern.compile("/^(([^<>()[\\]\\.,;:\\s@\\\"]+(\\.[^<>()[\\]\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@(([^<>()[\\]\\.,;:\\s@\\\"]+\\.)+[^<>()[\\]\\.,;:\\s@\\\"]{2,})$/i", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = patron.matcher(email);
+        return matcher.find();
     }
     public void cargarIntent(Class ventana){
         Intent intent = new Intent(this,ventana);

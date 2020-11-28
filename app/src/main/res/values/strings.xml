@@ -45,4 +45,5 @@
     <string name="recordatorios1">RECORDATORIOS</string>
     <string name="t_tulo4">TÍTULO:</string>
     <string name="fotocalendario">fotoCalendario</string>
+    <string name="checkbox">Aceptar los terminos y condiciones</string>
 </resources>

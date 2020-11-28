@@ -6,8 +6,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,8 +24,6 @@ import com.example.agendacontactos.R;
 import com.example.agendacontactos.controlador.ConexionRetrofit;
 import com.example.agendacontactos.api.service.UsuarioService;
 import com.example.agendacontactos.modelo.Usuario;
-
-import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,7 +34,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView iniciarSesion,registrarse;
     private EditText nickid,passid;
     private Button ini,reg;
-    //private UsuarioController usuarioController;
+    private CheckBox checkBox;
     private ConexionRetrofit conexion;
     private UsuarioService usuarioService;
 
@@ -41,14 +47,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         registrarse = (TextView) findViewById(R.id.registrarid);
         nickid = (EditText) findViewById(R.id.nicktextid);
         passid = (EditText) findViewById(R.id.passtextid);
+        checkBox = (CheckBox) findViewById(R.id.checkboxid);
         ini = (Button) findViewById(R.id.inicid);
         reg = (Button) findViewById(R.id.regisid);
         conexion = new ConexionRetrofit();
         usuarioService = conexion.getRetrofit().create(UsuarioService.class);
+        checkBox.setOnClickListener(this);
         iniciarSesion.setOnClickListener(this);
         registrarse.setOnClickListener(this);
         ini.setOnClickListener(this);
         reg.setOnClickListener(this);
+        checkBox.setText(Html.fromHtml("Aceptar <a href='http://agendaproject.herokuapp.com/Privacidad' >Términos y Condiciones</a> de uso"));
+        checkBox.setMovementMethod(LinkMovementMethod.getInstance());
+
         resetearPreferencias();
         ocultarTodo();
     }
@@ -70,16 +81,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     login();
                 break;
             case R.id.regisid:
-                if(comprobarCampos())
-                    registroNuevo();
+                if(comprobarCampos()){
+                    if(comprobarCheckbox()) {
+                        registroNuevo();
+                    }
+                }
                 break;
         }
     }
 
+    public boolean comprobarCheckbox(){
+        if(!checkBox.isChecked()){
+            Toast.makeText(this,"Debe aceptar los términos y condiciones",Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
     public boolean comprobarCampos(){
         if(nickid.getText().toString().isEmpty() || passid.getText().toString().isEmpty()){
-            Toast.makeText(this,"Debe rellenar campos de nickname y password",Toast.LENGTH_LONG).show();
-        return false;
+            Toast.makeText(this,"Debe rellenar campos de nickname, password",Toast.LENGTH_LONG).show();
+            return false;
         }
         return true;
     }
@@ -93,6 +115,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         nickid.setVisibility(View.VISIBLE);
         passid.setVisibility(View.VISIBLE);
         reg.setVisibility(View.VISIBLE);
+        checkBox.setVisibility(View.VISIBLE);
     }
 
     public void ocultarTodo(){
@@ -100,6 +123,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         passid.setVisibility(View.INVISIBLE);
         reg.setVisibility(View.INVISIBLE);
         ini.setVisibility(View.INVISIBLE);
+        checkBox.setVisibility(View.INVISIBLE);
     }
 
     public void registroNuevo(){
