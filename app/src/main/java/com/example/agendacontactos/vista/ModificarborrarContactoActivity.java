@@ -105,7 +105,7 @@ public class ModificarborrarContactoActivity extends AppCompatActivity implement
             else if(telefono.getText().toString().length()!=9){
                 Toast.makeText(this,"Formato de teléfono incorrecto",Toast.LENGTH_LONG).show();
             }
-            else if(email.getText().length()!=0 && !validarEmail(email.getText().toString())){
+            else if(email.getText().length() > 0 && !validarEmail(email.getText().toString())){
                 Toast.makeText(this,"Formato de email incorrecto",Toast.LENGTH_LONG).show();
             }
             else
@@ -144,7 +144,7 @@ public class ModificarborrarContactoActivity extends AppCompatActivity implement
     }
 
     private boolean validarEmail(String email) {
-        Pattern patron = Pattern.compile("/^(([^<>()[\\]\\.,;:\\s@\\\"]+(\\.[^<>()[\\]\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@(([^<>()[\\]\\.,;:\\s@\\\"]+\\.)+[^<>()[\\]\\.,;:\\s@\\\"]{2,})$/i", Pattern.CASE_INSENSITIVE);
+        Pattern patron = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = patron.matcher(email);
         return matcher.find();
     }

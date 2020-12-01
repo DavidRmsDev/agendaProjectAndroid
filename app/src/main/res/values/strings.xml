@@ -2,7 +2,7 @@
     <string name="app_name">AgendaContactos</string>
     <string name="contactos">CONTACTOS</string>
     <string name="titulo">Título:</string>
-    <string name="aniadir">Añadir</string>
+    <string name="aniadir">AÑADIR</string>
     <string name="nota">Nota:</string>
     <string name="aniadir2">AÑADIR</string>
     <string name="blanco" />
@@ -46,4 +46,6 @@
     <string name="t_tulo4">TÍTULO:</string>
     <string name="fotocalendario">fotoCalendario</string>
     <string name="checkbox">Aceptar los terminos y condiciones</string>
+    <string name="contacto">CONTACTO</string>
+    <string name="recordatorio2">RECORDATORIO</string>
 </resources>

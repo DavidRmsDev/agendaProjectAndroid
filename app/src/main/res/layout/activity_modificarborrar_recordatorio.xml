@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="33dp"
-        android:text="@string/recordatorio"
+        android:text="@string/recordatorio2"
         android:textColor="@android:color/holo_red_dark"
         android:textSize="38sp"
         android:textStyle="bold|italic"

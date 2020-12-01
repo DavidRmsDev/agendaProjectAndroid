@@ -7,13 +7,55 @@
     android:background="@drawable/fondopapel"
     tools:context=".vista.ModificarborrarContactoActivity">
 
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:text="@string/contacto"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="38sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/modificarbtn"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/buttonshape"
+        android:shadowColor="#E3E3E3"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        android:text="@string/modificar"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fotomodid" />
+
+    <ImageView
+        android:id="@+id/fotomodid"
+        android:layout_width="137dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="40dp"
+        android:layout_weight="1"
+        android:contentDescription="@string/foto"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView10"
+        app:srcCompat="@drawable/contactoimagen" />
+
     <LinearLayout
         android:layout_width="253dp"
         android:layout_height="473dp"
+        android:layout_marginTop="24dp"
         android:layout_weight="1"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/textView10">
 
         <EditText
             android:id="@+id/nombretextview"
@@ -21,10 +63,10 @@
             android:layout_height="60dp"
             android:layout_marginStart="30dp"
             android:layout_marginTop="20dp"
-            android:maxLength="25"
             android:hint="@string/nombre"
             android:importantForAutofill="no"
-            android:inputType="text"/>
+            android:inputType="text"
+            android:maxLength="25" />
 
         <EditText
             android:id="@+id/apellidostextview"
@@ -34,7 +76,7 @@
             android:layout_marginTop="20dp"
             android:hint="@string/apellidos"
             android:importantForAutofill="no"
-            android:inputType="textMultiLine"/>
+            android:inputType="textMultiLine" />
 
         <EditText
             android:id="@+id/telefonotextview"
@@ -44,7 +86,7 @@
             android:layout_marginTop="20dp"
             android:hint="@string/tel_fono"
             android:importantForAutofill="no"
-            android:inputType="phone"/>
+            android:inputType="phone" />
 
         <EditText
             android:id="@+id/direcciontextview"
@@ -54,7 +96,7 @@
             android:layout_marginTop="20dp"
             android:hint="@string/direcci_n"
             android:importantForAutofill="no"
-            android:inputType="textMultiLine"/>
+            android:inputType="textMultiLine" />
 
         <EditText
             android:id="@+id/emailtextview"
@@ -64,53 +106,24 @@
             android:layout_marginTop="20dp"
             android:hint="@string/email"
             android:importantForAutofill="no"
-            android:inputType="textEmailAddress"
-            />
+            android:inputType="textEmailAddress" />
 
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/fotomodid"
-        android:layout_width="137dp"
-        android:layout_height="150dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        android:contentDescription="@string/foto"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/contactoimagen" />
-
-    <Button
-        android:id="@+id/modificarbtn"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="240dp"
-        android:text="@string/modificar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/buttonshape"
-        android:shadowColor="#E3E3E3"
-        android:shadowDx="0"
-        android:shadowDy="0"
-        android:shadowRadius="5"
-        android:textColor="#FFFFFF"/>
-
     <Button
         android:id="@+id/borrarbtn"
         android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="340dp"
-        android:text="@string/borrar2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="24dp"
         android:background="@drawable/buttonshape"
         android:shadowColor="#E3E3E3"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
-        android:textColor="#FFFFFF"/>
+        android:text="@string/borrar2"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/modificarbtn" />
 </androidx.constraintlayout.widget.ConstraintLayout>
