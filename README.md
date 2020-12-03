@@ -1,19 +1,11 @@
 # AgendaProjectAndroid
 
-Proyecto en Android de una Agenda que guarda contactos, notas y recordatorios. Esta app permite crear, modificar o borrar los datos que esten asociados a tu usuario.
+Proyecto programado en Java para Android de una Agenda que guarda contactos, notas y recordatorios. Esta app permite crear, modificar y borrar los datos que esten asociados a tu usuario.
+Ese necesario aceptar los términos y condiciones para registrarse y guardar datos en la aplicación.
 
-*  La pantalla principal de la aplicación muestra el login y registro de usuarios:
-![alt text]()
+# Herramientas e IDE
+Es necesario tener Android Studio o IntelliJ con el SDK en la versión 23 y Gradle en versión 4.1.1.
 
-*  Una vez que hemos iniciado sesión con éxito nos aparece el menú siguiente:
-![alt text]()
-
-*  Pantalla de Contactos:
-![alt text]()
-
-*  Pantalla de Notas:
-![alt text]()
-
-*  Pantalla de Recordatorios:
-![alt text]()
+# Términos y condiciones
+* revisar términos y condiciones: [Política de privacidad](http://agendaproject.herokuapp.com/Privacidad)
 ___________________________________________________________________________________@DavidRmsDev-@FranciscoHerrero
