@@ -137,6 +137,9 @@ public class AniadirRecordatorioActivity extends AppCompatActivity implements Vi
         else if(hora.getText().toString().isEmpty()){
             Toast.makeText(this,"Debe añadir una hora",Toast.LENGTH_LONG).show();
         }
+        else if(descripcion.getText().toString().isEmpty()) {
+            Toast.makeText(this, "Debe añadir una descripción", Toast.LENGTH_LONG).show();
+        }
         else {
             crearRecordatorio();
             añadir();
